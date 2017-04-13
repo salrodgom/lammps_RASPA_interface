@@ -1,0 +1,44 @@
+#
+units          metal
+box tilt large
+boundary       p p p
+atom_style     full
+bond_style     harmonic
+angle_style    harmonic
+dihedral_style fourier 
+improper_style none
+pair_style     lj/cut/coul/long 12.0
+kspace_style   ewald 1e-8
+box tilt large
+read_data      output.data
+pair_modify    mix arithmetic shift yes tail no table 0
+special_bonds  lj 0.0 0.0  0.00000 coul 0.0 0.0  0.00000
+#   1     65.3700027  # Zn
+#   2     12.0107002  # C1
+#   3     14.0067396  # N1
+#   4     12.0107002  # C2
+#   5     12.0107002  # C3
+#   6      1.0079401  # H2
+#   7      1.0079401  # H3
+#   8     12.0107002  # C4
+#   9     12.0107002  # C5
+#  10     12.0107002  # C6
+#  11      1.0079401  # H1
+#
+variable    TK equal 300.0
+variable    RandomSeed equal 123456789
+#
+dump        traj_all   all     custom 100  all.lammpstrj       element xs ys zs
+dump_modify traj_all   element Zn C N C C H H C C C H  first yes sort id 
+dump        traj all xyz 100 traj.xyz
+dump_modify traj element Zn C N C C H H C C C H sort id
+#
+velocity    all create ${TK} ${RandomSeed}
+variable    dt     equal 0.0005
+variable    tdamp  equal 100*${dt}
+fix         2 all langevin ${TK} ${TK} ${tdamp} ${RandomSeed}
+fix         3 all nve
+thermo      100
+run         10000
+undump      traj_all
+undump      traj

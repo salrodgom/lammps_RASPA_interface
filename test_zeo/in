@@ -1,0 +1,31 @@
+#
+units          metal
+boundary       p p p
+atom_style     full
+bond_style     harmonic
+angle_style    harmonic
+dihedral_style none
+improper_style none
+pair_style     lj/cut/coul/long 12.0
+kspace_style   ewald 1e-8
+read_data      SOF_122_PS.data
+pair_modify    mix arithmetic shift yes tail no table 0
+special_bonds  lj 0.0 0.0  0.00000 coul 0.0 0.0  0.00000
+#
+variable    TK equal 300.0
+variable    RandomSeed equal 123456789
+#
+dump        traj_all   all     custom 10  all.lammpstrj       element xs ys zs
+dump_modify traj_all   element Si O  first yes sort id 
+dump        traj all xyz 10 traj.xyz
+dump_modify  traj element Si O
+#
+velocity    all create ${TK} ${RandomSeed}
+variable    dt     equal 0.0005
+variable    tdamp  equal 100*${dt}
+fix         2 all langevin ${TK} ${TK} ${tdamp} ${RandomSeed}
+fix         3 all nve
+thermo      1
+run         1000
+undump      traj_all
+undump      traj

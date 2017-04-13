@@ -255,7 +255,7 @@ program zif_cif2gin
      atom(i)%charge = -0.0839
     else if ( h==2 .and. l==0 ) then
      atom(i)%new_label = "C4  "
-     atom(i)%charge =  +0.2567
+     atom(i)%charge =  +0.259300001
     else if ( h==2 .and. l==1 ) then
      atom(i)%new_label = "C1  "
      atom(i)%charge = +0.4291
@@ -267,7 +267,7 @@ program zif_cif2gin
      atom(i)%charge = +0.0
     else if ( h==0 .and. l==2 ) then
      atom(i)%new_label = "C6  "
-     atom(i)%charge = -0.0550
+     atom(i)%charge = -0.09835
     else
      stop 'unknow C-atom'
     end if
@@ -286,7 +286,7 @@ program zif_cif2gin
        atom(i)%charge = +0.1128
       else if( atom(j)%new_label == "C3  " ) then
        atom(i)%new_label = "H3  "
-       atom(i)%charge = +0.1310
+       atom(i)%charge = +0.131866667
       else if( atom(j)%new_label == "C6  " ) then
        atom(i)%new_label = "H1  "
        atom(i)%charge = +0.1128

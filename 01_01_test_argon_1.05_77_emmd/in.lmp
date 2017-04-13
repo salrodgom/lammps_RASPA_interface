@@ -1,4 +1,4 @@
-# FILENAME
+# 01_01_test_argon_1.05_77
 shell mkdir logs
 shell mkdir movs
 log        logs/log.main
@@ -12,12 +12,12 @@ dihedral_style fourier
 improper_style none
 pair_style     lj/cut/coul/long 12.0
 kspace_style   ewald 1e-8
-read_data      FILENAME.lmp
+read_data      01_01_test_argon_1.05_77.lmp
 pair_modify    mix arithmetic shift yes tail no table 0
 special_bonds  lj 0.0 0.0  0.00000 coul 0.0 0.0  0.00000
 
-variable TK          equal   TEMPERATURE
-variable Pbar        equal   PRESSURE
+variable TK          equal   77
+variable Pbar        equal   1.05
 variable dt          equal       0.0005
 variable tdamp       equal     100*${dt}
 variable NumberOfNVEMDCycles equal 10000  #200000
@@ -27,7 +27,7 @@ variable RandomSeed          equal 1115111
 variable Gnorm               equal 1e-2 #1.0e-4 #1e-6
 # ------------------------ Equilibration Run -------------------------------
 #dump        traj_opti structure custom ${ndump} movs/opti.lammpstrj element xs ys zs
-#dump_modify traj_opti element ELEMENTS first yes sort id
+#dump_modify traj_opti element Zn  C  N  C  C  H  H  Ar  first yes sort id
 print "MinStep CellMinStep AtomMinStep FinalStep Energy EDiff" file logs/minimization.txt screen no
 variable min_eval equal ${Gnorm}
 variable           prev_E     equal 50000.00
@@ -61,11 +61,11 @@ label       break_min
 #undump      traj_opti
 # start MD
 #dump        traj_frame structure custom ${ndump} movs/framework.lammpstrj element xs ys zs
-#dump_modify traj_frame element ELEMENTS first yes sort id
+#dump_modify traj_frame element Zn  C  N  C  C  H  H  Ar  first yes sort id
 #dump        traj_guest guest     custom ${ndump} movs/guests.lammpstrj    element xs ys zs
-#dump_modify traj_guest element ELEMENTS first yes sort id
+#dump_modify traj_guest element Zn  C  N  C  C  H  H  Ar  first yes sort id
 dump        traj_all   all       custom ${ndump} movs/all.lammpstrj       element xs ys zs
-dump_modify traj_all   element ELEMENTS first yes sort id
+dump_modify traj_all   element Zn  C  N  C  C  H  H  Ar  first yes sort id
 reset_timestep 0
 # 
 velocity    all scale ${TK}

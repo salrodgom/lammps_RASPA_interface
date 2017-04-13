@@ -8,6 +8,7 @@ pressure="1.05"
 guest="argon"
 MCCycles=1
 MCEMMDCycles=1
+nCPU=16
 # Files:
 raspa_files_folder=$(pwd)/lib/fff_raspa
 lammps_files_folder=$(pwd)/lib/fff_lammps
@@ -31,7 +32,7 @@ function mc_raspa {
     sed -i "s/TEMPERATURE/${temperature}/g" simulation.input
     sed -i "s/PRESSURE/${pressure}/g" simulation.input
     sed -i "s/GUEST/${guest}/g" simulation.input
-    sed -i "s/SUPERCELL/1 1 1/g" simulation.input
+    sed -i "s/SUPERCELL/2 2 2/g" simulation.input
     simulate > /dev/null
     sed '/MODEL    2/,$d' Movies/System_0/Movie*allcomponents.pdb > c
     sed 's/MODEL    2/MODEL    1/g' c > ../${CyclesNameFile}.pdb
@@ -56,13 +57,14 @@ function em_md_lammps {
  mkdir $folder
  cp ${CyclesNameFile}.lmp $folder/.
  cp ${lammps_files_folder}/in.lmp $folder/in.lmp
+ cp atom_types_for_dump.txt $folder/.
  cd $folder
   sed -i "s/TEMPERATURE/${temperature}/g" in.lmp
   sed -i "s/PRESSURE/${pressure}/g" in.lmp
   sed -i "s/FILENAME/${CyclesNameFile}/g" in.lmp
-  elements=$(cat atom_types_for_dump.txt)
+  elements=$(cat atom_types_for_dump.txt | sed 's/[0-9]//g' | sed 's/  / /g')
   sed -i "s/ELEMENTS/${elements}/g" in.lmp
-  mpirun --np 4 lmp_mpi -in in.lmp -sf opt
+  mpirun --np $nCPU lmp_mpi -in in.lmp -sf opt
  cd ..
 }
 function raspa_lammps {
@@ -75,7 +77,7 @@ function raspa_lammps {
  mv ${CyclesNameFile}.data ${CyclesNameFile}.lmp
 }
 function lammps_raspa {
- ./lammpstrj2pdb < $folder/movs/framework.lammpstrj
+ ./lammpstrj2pdb < $folder/movs/all.lammpstrj
  n_lines=$(wc -l out.pdb |awk '{print $1}')
  line=$(sed -n '/MODEL/{=;p}' out.pdb | sed '{N;s/\n/ /}' | tail -n1 | awk '{print $1}')
  end=$((n_lines - line + 1))

@@ -357,3 +357,46 @@ variable           CellMinStep equal ${tempstp}
 variable           CellMinStep equal 110651
 log logs/log.opt.${iter}
 log logs/log.opt.12
+variable           AtomMinStep equal ${tempstp}
+variable           AtomMinStep equal 110651
+variable           temppe      equal $(pe)
+variable           temppe      equal 820.37595407146659454
+variable           min_E       equal abs(${prev_E}-${temppe})
+variable           min_E       equal abs(820.412008121331-${temppe})
+variable           min_E       equal abs(820.412008121331-820.375954071467)
+print "${iter} ${CellMinStep} ${AtomMinStep} ${AtomMinStep} $(pe) ${min_E}" append logs/minimization.txt screen no
+if "${min_E} < ${min_eval}" then "jump SELF break_min"
+variable    prev_E     equal ${temppe}
+variable    prev_E     equal 820.375954071467
+next        iter
+jump        SELF loop_min
+min_style          cg
+fix                1 all box/relax tri 0.0 vmax 0.01
+log logs/log.opt.${iter}
+log logs/log.opt.13
+unfix              1
+min_style          fire
+timestep           0.0005
+variable           tempstp     equal $(step)
+variable           tempstp     equal 127458
+variable           CellMinStep equal ${tempstp}
+variable           CellMinStep equal 127458
+log logs/log.opt.${iter}
+log logs/log.opt.13
+variable           AtomMinStep equal ${tempstp}
+variable           AtomMinStep equal 127458
+variable           temppe      equal $(pe)
+variable           temppe      equal 820.30905207972364224
+variable           min_E       equal abs(${prev_E}-${temppe})
+variable           min_E       equal abs(820.375954071467-${temppe})
+variable           min_E       equal abs(820.375954071467-820.309052079724)
+print "${iter} ${CellMinStep} ${AtomMinStep} ${AtomMinStep} $(pe) ${min_E}" append logs/minimization.txt screen no
+if "${min_E} < ${min_eval}" then "jump SELF break_min"
+variable    prev_E     equal ${temppe}
+variable    prev_E     equal 820.309052079724
+next        iter
+jump        SELF loop_min
+min_style          cg
+fix                1 all box/relax tri 0.0 vmax 0.01
+log logs/log.opt.${iter}
+log logs/log.opt.14

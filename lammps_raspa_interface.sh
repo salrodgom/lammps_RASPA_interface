@@ -37,6 +37,7 @@ function mc_raspa {
     sed '/MODEL    2/,$d' Movies/System_0/Movie*allcomponents.pdb > c
     sed 's/MODEL    2/MODEL    1/g' c > ../${CyclesNameFile}.pdb
     rm c
+    rm -rf VTK Movies/System_0/Framework* Movies/System_0/Movie_*_component_*.pdb Movies/System_0/Movie_*_frameworks.pdb 
    cd ..
   fi
  done

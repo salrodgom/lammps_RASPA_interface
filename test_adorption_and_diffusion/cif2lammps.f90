@@ -33,7 +33,7 @@ program zif_cif2gin
   integer          :: type_
   character(len=2) :: label_element
   character(len=4) :: label
-  character(len=4) :: new_label="Xxxx"
+  character(len=4) :: new_label
   integer          :: degree
   real             :: charge 
   real             :: radius
@@ -156,7 +156,6 @@ program zif_cif2gin
  end do read_natoms
 !
  allocate(atom(n_atoms))
- atom(1:n_atoms)%new_label="Xxxx"
  allocate(ConnectedAtoms(n_atoms,n_atoms))
  allocate(DistanceMatrix(n_atoms,n_atoms))
 !
@@ -297,13 +296,10 @@ program zif_cif2gin
      end if
     end do
    end if
-  end do scan_for_rename_H_atoms 
+  end do scan_for_rename_H_atoms
+  
   do i=1,n_atoms
-   if(atom(i)%new_label/="Xxxx")then
-    atom(i)%label=atom(i)%new_label
-   !else
-   ! 
-   end if
+   atom(i)%label=atom(i)%new_label
   end do 
   ! }}
  end if
@@ -1155,11 +1151,6 @@ program zif_cif2gin
     m=26.9800
     s=1.14
     zlabel='Al'
-   case('Ar  ')
-    Z=18
-    m=39.948
-    zlabel="Ar"
-    s=0.0
    case('Xe  ')
     Z=54
     m=131.293

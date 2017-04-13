@@ -334,6 +334,9 @@ program zif_cif2gin
  do i=1,n_atom_types
   write(6,*)atom_types(i)
  end do
+ open(987,file="atom_types_for_dump.txt")
+ write(987,'(100(a4,1x))') ( atom_types(i), i=1,n_atom_types)
+ close(987)
  write(6,*)'=========='
 ! bonds: 
  allocate(bond_type_string(bond_types_max))
@@ -1011,17 +1014,17 @@ program zif_cif2gin
    write(u,'(i4,3x,a,a,a)')i,adjustl(str(1:Clen_trim(str))),' # ',tors_type_string(i)
   end do
   write(u,*)' '
-  write(u,'(a)')'Improper Coeffs'
-  write(u,*)' '
-  do i=1,n_impr_types
-   read(tors_type_string(i),'(4a4)')(label(ii),ii=1,4)
-   forall (ii=1:80)
-    str(ii:ii)=" "
-   end forall
-   call search_forcefield(str,'impr',label)
-   write(u,'(i4,3x,a,a,a)')i,adjustl(str(1:Clen_trim(str))),' # ',impr_type_string(i)
-  end do
-  write(u,*)' '
+  !write(u,'(a)')'Improper Coeffs'
+  !write(u,*)' '
+  !do i=1,n_impr_types
+  ! read(tors_type_string(i),'(4a4)')(label(ii),ii=1,4)
+  ! forall (ii=1:80)
+  !  str(ii:ii)=" "
+  ! end forall
+  ! call search_forcefield(str,'impr',label)
+  ! write(u,'(i4,3x,a,a,a)')i,adjustl(str(1:Clen_trim(str))),' # ',impr_type_string(i)
+  !end do
+  !write(u,*)' '
   write(u,'(a)')'Pair Coeffs'
   write(u,*)' '
   do i=1,n_atom_types

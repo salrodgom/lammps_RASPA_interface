@@ -113,5 +113,6 @@ C6   C6    lj/cut          0.0667      3.431
 H2   H2    lj/cut          0.0279      2.571
 H1   H1    lj/cut          0.0279      2.571
 H3   H3    lj/cut          0.0279      2.571
+Ar   Ar    lj/cut          0.996066    3.34  # RASPA: GenericMOFs forcefield
 #
 End  

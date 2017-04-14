@@ -1,5 +1,0 @@
-LAMMPS (10 Mar 2017)
-# 01_01_test_argon_1.05_77
-shell mkdir logs
-shell mkdir movs
-log        logs/log.main

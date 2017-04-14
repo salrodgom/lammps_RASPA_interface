@@ -1,0 +1,487 @@
+units      metal
+boundary   p p p
+atom_style full
+
+bond_style     harmonic
+angle_style    harmonic
+dihedral_style fourier
+improper_style none
+pair_style     lj/cut/coul/long 12.0
+kspace_style   ewald 1e-8
+read_data      01_01_test_argon_1.05_77.lmp
+  triclinic box = (0 0 0) to (32.554 32.554 32.554) with tilt (0 0 0)
+  2 by 2 by 4 MPI processor grid
+  reading atoms ...
+  2264 atoms
+  scanning bonds ...
+  4 = max bonds/atom
+  scanning angles ...
+  12 = max angles/atom
+  scanning dihedrals ...
+  24 = max dihedrals/atom
+  scanning impropers ...
+  10 = max impropers/atom
+  reading bonds ...
+  2496 bonds
+  reading angles ...
+  9204 angles
+  reading dihedrals ...
+  14576 dihedrals
+  reading impropers ...
+  12672 impropers
+  4 = max # of 1-2 neighbors
+  8 = max # of 1-3 neighbors
+  24 = max # of 1-4 neighbors
+  28 = max # of special neighbors
+pair_modify    mix arithmetic shift yes tail no table 0
+special_bonds  lj 0.0 0.0  0.00000 coul 0.0 0.0  0.00000
+
+variable TK          equal   77
+variable Pbar        equal   1.05
+variable dt          equal       0.0005
+variable tdamp       equal     100*${dt}
+variable tdamp       equal     100*0.0005
+variable NumberOfNVEMDCycles equal 10000  #200000
+variable NumberOfNPTMDCycles equal 100000 #1800000
+variable ndump               equal 1000
+variable RandomSeed          equal 1115111
+variable Gnorm               equal 1e-2 #1.0e-4 #1e-6
+# ------------------------ Equilibration Run -------------------------------
+#dump        traj_opti structure custom ${ndump} movs/opti.lammpstrj element xs ys zs
+#dump_modify traj_opti element Zn  C  N  C  C  H  H  Ar  first yes sort id
+print "MinStep CellMinStep AtomMinStep FinalStep Energy EDiff" file logs/minimization.txt screen no
+variable min_eval equal ${Gnorm}
+variable min_eval equal 0.01
+variable           prev_E     equal 50000.00
+variable           iter       loop 100000
+# loop min
+thermo             100
+thermo_style       one
+label              loop_min
+min_style          cg
+fix                1 all box/relax tri 0.0 vmax 0.01
+log logs/log.opt.${iter}
+log logs/log.opt.1
+unfix              1
+min_style          fire
+timestep           0.0005
+variable           tempstp     equal $(step)
+variable           tempstp     equal 191
+variable           CellMinStep equal ${tempstp}
+variable           CellMinStep equal 191
+log logs/log.opt.${iter}
+log logs/log.opt.1
+variable           AtomMinStep equal ${tempstp}
+variable           AtomMinStep equal 191
+variable           temppe      equal $(pe)
+variable           temppe      equal 828.87327535081260521
+variable           min_E       equal abs(${prev_E}-${temppe})
+variable           min_E       equal abs(50000-${temppe})
+variable           min_E       equal abs(50000-828.873275350813)
+print "${iter} ${CellMinStep} ${AtomMinStep} ${AtomMinStep} $(pe) ${min_E}" append logs/minimization.txt screen no
+if "${min_E} < ${min_eval}" then "jump SELF break_min"
+variable    prev_E     equal ${temppe}
+variable    prev_E     equal 828.873275350813
+next        iter
+jump        SELF loop_min
+min_style          cg
+fix                1 all box/relax tri 0.0 vmax 0.01
+log logs/log.opt.${iter}
+log logs/log.opt.2
+unfix              1
+min_style          fire
+timestep           0.0005
+variable           tempstp     equal $(step)
+variable           tempstp     equal 10205
+variable           CellMinStep equal ${tempstp}
+variable           CellMinStep equal 10205
+log logs/log.opt.${iter}
+log logs/log.opt.2
+variable           AtomMinStep equal ${tempstp}
+variable           AtomMinStep equal 10205
+variable           temppe      equal $(pe)
+variable           temppe      equal 825.89790871180514387
+variable           min_E       equal abs(${prev_E}-${temppe})
+variable           min_E       equal abs(828.873275350813-${temppe})
+variable           min_E       equal abs(828.873275350813-825.897908711805)
+print "${iter} ${CellMinStep} ${AtomMinStep} ${AtomMinStep} $(pe) ${min_E}" append logs/minimization.txt screen no
+if "${min_E} < ${min_eval}" then "jump SELF break_min"
+variable    prev_E     equal ${temppe}
+variable    prev_E     equal 825.897908711805
+next        iter
+jump        SELF loop_min
+min_style          cg
+fix                1 all box/relax tri 0.0 vmax 0.01
+log logs/log.opt.${iter}
+log logs/log.opt.3
+unfix              1
+min_style          fire
+timestep           0.0005
+variable           tempstp     equal $(step)
+variable           tempstp     equal 20215
+variable           CellMinStep equal ${tempstp}
+variable           CellMinStep equal 20215
+log logs/log.opt.${iter}
+log logs/log.opt.3
+variable           AtomMinStep equal ${tempstp}
+variable           AtomMinStep equal 20215
+variable           temppe      equal $(pe)
+variable           temppe      equal 824.95512798617778571
+variable           min_E       equal abs(${prev_E}-${temppe})
+variable           min_E       equal abs(825.897908711805-${temppe})
+variable           min_E       equal abs(825.897908711805-824.955127986178)
+print "${iter} ${CellMinStep} ${AtomMinStep} ${AtomMinStep} $(pe) ${min_E}" append logs/minimization.txt screen no
+if "${min_E} < ${min_eval}" then "jump SELF break_min"
+variable    prev_E     equal ${temppe}
+variable    prev_E     equal 824.955127986178
+next        iter
+jump        SELF loop_min
+min_style          cg
+fix                1 all box/relax tri 0.0 vmax 0.01
+log logs/log.opt.${iter}
+log logs/log.opt.4
+unfix              1
+min_style          fire
+timestep           0.0005
+variable           tempstp     equal $(step)
+variable           tempstp     equal 30220
+variable           CellMinStep equal ${tempstp}
+variable           CellMinStep equal 30220
+log logs/log.opt.${iter}
+log logs/log.opt.4
+variable           AtomMinStep equal ${tempstp}
+variable           AtomMinStep equal 30220
+variable           temppe      equal $(pe)
+variable           temppe      equal 824.53728717503963708
+variable           min_E       equal abs(${prev_E}-${temppe})
+variable           min_E       equal abs(824.955127986178-${temppe})
+variable           min_E       equal abs(824.955127986178-824.53728717504)
+print "${iter} ${CellMinStep} ${AtomMinStep} ${AtomMinStep} $(pe) ${min_E}" append logs/minimization.txt screen no
+if "${min_E} < ${min_eval}" then "jump SELF break_min"
+variable    prev_E     equal ${temppe}
+variable    prev_E     equal 824.53728717504
+next        iter
+jump        SELF loop_min
+min_style          cg
+fix                1 all box/relax tri 0.0 vmax 0.01
+log logs/log.opt.${iter}
+log logs/log.opt.5
+unfix              1
+min_style          fire
+timestep           0.0005
+variable           tempstp     equal $(step)
+variable           tempstp     equal 40244
+variable           CellMinStep equal ${tempstp}
+variable           CellMinStep equal 40244
+log logs/log.opt.${iter}
+log logs/log.opt.5
+variable           AtomMinStep equal ${tempstp}
+variable           AtomMinStep equal 40244
+variable           temppe      equal $(pe)
+variable           temppe      equal 823.76724280374355658
+variable           min_E       equal abs(${prev_E}-${temppe})
+variable           min_E       equal abs(824.53728717504-${temppe})
+variable           min_E       equal abs(824.53728717504-823.767242803744)
+print "${iter} ${CellMinStep} ${AtomMinStep} ${AtomMinStep} $(pe) ${min_E}" append logs/minimization.txt screen no
+if "${min_E} < ${min_eval}" then "jump SELF break_min"
+variable    prev_E     equal ${temppe}
+variable    prev_E     equal 823.767242803744
+next        iter
+jump        SELF loop_min
+min_style          cg
+fix                1 all box/relax tri 0.0 vmax 0.01
+log logs/log.opt.${iter}
+log logs/log.opt.6
+unfix              1
+min_style          fire
+timestep           0.0005
+variable           tempstp     equal $(step)
+variable           tempstp     equal 50250
+variable           CellMinStep equal ${tempstp}
+variable           CellMinStep equal 50250
+log logs/log.opt.${iter}
+log logs/log.opt.6
+variable           AtomMinStep equal ${tempstp}
+variable           AtomMinStep equal 50250
+variable           temppe      equal $(pe)
+variable           temppe      equal 823.54013474034366027
+variable           min_E       equal abs(${prev_E}-${temppe})
+variable           min_E       equal abs(823.767242803744-${temppe})
+variable           min_E       equal abs(823.767242803744-823.540134740344)
+print "${iter} ${CellMinStep} ${AtomMinStep} ${AtomMinStep} $(pe) ${min_E}" append logs/minimization.txt screen no
+if "${min_E} < ${min_eval}" then "jump SELF break_min"
+variable    prev_E     equal ${temppe}
+variable    prev_E     equal 823.540134740344
+next        iter
+jump        SELF loop_min
+min_style          cg
+fix                1 all box/relax tri 0.0 vmax 0.01
+log logs/log.opt.${iter}
+log logs/log.opt.7
+unfix              1
+min_style          fire
+timestep           0.0005
+variable           tempstp     equal $(step)
+variable           tempstp     equal 60283
+variable           CellMinStep equal ${tempstp}
+variable           CellMinStep equal 60283
+log logs/log.opt.${iter}
+log logs/log.opt.7
+variable           AtomMinStep equal ${tempstp}
+variable           AtomMinStep equal 60283
+variable           temppe      equal $(pe)
+variable           temppe      equal 822.94179088705516278
+variable           min_E       equal abs(${prev_E}-${temppe})
+variable           min_E       equal abs(823.540134740344-${temppe})
+variable           min_E       equal abs(823.540134740344-822.941790887055)
+print "${iter} ${CellMinStep} ${AtomMinStep} ${AtomMinStep} $(pe) ${min_E}" append logs/minimization.txt screen no
+if "${min_E} < ${min_eval}" then "jump SELF break_min"
+variable    prev_E     equal ${temppe}
+variable    prev_E     equal 822.941790887055
+next        iter
+jump        SELF loop_min
+min_style          cg
+fix                1 all box/relax tri 0.0 vmax 0.01
+log logs/log.opt.${iter}
+log logs/log.opt.8
+unfix              1
+min_style          fire
+timestep           0.0005
+variable           tempstp     equal $(step)
+variable           tempstp     equal 70380
+variable           CellMinStep equal ${tempstp}
+variable           CellMinStep equal 70380
+log logs/log.opt.${iter}
+log logs/log.opt.8
+variable           AtomMinStep equal ${tempstp}
+variable           AtomMinStep equal 70380
+variable           temppe      equal $(pe)
+variable           temppe      equal 820.9976406904382884
+variable           min_E       equal abs(${prev_E}-${temppe})
+variable           min_E       equal abs(822.941790887055-${temppe})
+variable           min_E       equal abs(822.941790887055-820.997640690438)
+print "${iter} ${CellMinStep} ${AtomMinStep} ${AtomMinStep} $(pe) ${min_E}" append logs/minimization.txt screen no
+if "${min_E} < ${min_eval}" then "jump SELF break_min"
+variable    prev_E     equal ${temppe}
+variable    prev_E     equal 820.997640690438
+next        iter
+jump        SELF loop_min
+min_style          cg
+fix                1 all box/relax tri 0.0 vmax 0.01
+log logs/log.opt.${iter}
+log logs/log.opt.9
+unfix              1
+min_style          fire
+timestep           0.0005
+variable           tempstp     equal $(step)
+variable           tempstp     equal 80390
+variable           CellMinStep equal ${tempstp}
+variable           CellMinStep equal 80390
+log logs/log.opt.${iter}
+log logs/log.opt.9
+variable           AtomMinStep equal ${tempstp}
+variable           AtomMinStep equal 80390
+variable           temppe      equal $(pe)
+variable           temppe      equal 820.61601602623807139
+variable           min_E       equal abs(${prev_E}-${temppe})
+variable           min_E       equal abs(820.997640690438-${temppe})
+variable           min_E       equal abs(820.997640690438-820.616016026238)
+print "${iter} ${CellMinStep} ${AtomMinStep} ${AtomMinStep} $(pe) ${min_E}" append logs/minimization.txt screen no
+if "${min_E} < ${min_eval}" then "jump SELF break_min"
+variable    prev_E     equal ${temppe}
+variable    prev_E     equal 820.616016026238
+next        iter
+jump        SELF loop_min
+min_style          cg
+fix                1 all box/relax tri 0.0 vmax 0.01
+log logs/log.opt.${iter}
+log logs/log.opt.10
+unfix              1
+min_style          fire
+timestep           0.0005
+variable           tempstp     equal $(step)
+variable           tempstp     equal 90463
+variable           CellMinStep equal ${tempstp}
+variable           CellMinStep equal 90463
+log logs/log.opt.${iter}
+log logs/log.opt.10
+variable           AtomMinStep equal ${tempstp}
+variable           AtomMinStep equal 90463
+variable           temppe      equal $(pe)
+variable           temppe      equal 820.45679401898360084
+variable           min_E       equal abs(${prev_E}-${temppe})
+variable           min_E       equal abs(820.616016026238-${temppe})
+variable           min_E       equal abs(820.616016026238-820.456794018984)
+print "${iter} ${CellMinStep} ${AtomMinStep} ${AtomMinStep} $(pe) ${min_E}" append logs/minimization.txt screen no
+if "${min_E} < ${min_eval}" then "jump SELF break_min"
+variable    prev_E     equal ${temppe}
+variable    prev_E     equal 820.456794018984
+next        iter
+jump        SELF loop_min
+min_style          cg
+fix                1 all box/relax tri 0.0 vmax 0.01
+log logs/log.opt.${iter}
+log logs/log.opt.11
+unfix              1
+min_style          fire
+timestep           0.0005
+variable           tempstp     equal $(step)
+variable           tempstp     equal 100517
+variable           CellMinStep equal ${tempstp}
+variable           CellMinStep equal 100517
+log logs/log.opt.${iter}
+log logs/log.opt.11
+variable           AtomMinStep equal ${tempstp}
+variable           AtomMinStep equal 100517
+variable           temppe      equal $(pe)
+variable           temppe      equal 820.41200812133092768
+variable           min_E       equal abs(${prev_E}-${temppe})
+variable           min_E       equal abs(820.456794018984-${temppe})
+variable           min_E       equal abs(820.456794018984-820.412008121331)
+print "${iter} ${CellMinStep} ${AtomMinStep} ${AtomMinStep} $(pe) ${min_E}" append logs/minimization.txt screen no
+if "${min_E} < ${min_eval}" then "jump SELF break_min"
+variable    prev_E     equal ${temppe}
+variable    prev_E     equal 820.412008121331
+next        iter
+jump        SELF loop_min
+min_style          cg
+fix                1 all box/relax tri 0.0 vmax 0.01
+log logs/log.opt.${iter}
+log logs/log.opt.12
+unfix              1
+min_style          fire
+timestep           0.0005
+variable           tempstp     equal $(step)
+variable           tempstp     equal 110651
+variable           CellMinStep equal ${tempstp}
+variable           CellMinStep equal 110651
+log logs/log.opt.${iter}
+log logs/log.opt.12
+variable           AtomMinStep equal ${tempstp}
+variable           AtomMinStep equal 110651
+variable           temppe      equal $(pe)
+variable           temppe      equal 820.37595407146659454
+variable           min_E       equal abs(${prev_E}-${temppe})
+variable           min_E       equal abs(820.412008121331-${temppe})
+variable           min_E       equal abs(820.412008121331-820.375954071467)
+print "${iter} ${CellMinStep} ${AtomMinStep} ${AtomMinStep} $(pe) ${min_E}" append logs/minimization.txt screen no
+if "${min_E} < ${min_eval}" then "jump SELF break_min"
+variable    prev_E     equal ${temppe}
+variable    prev_E     equal 820.375954071467
+next        iter
+jump        SELF loop_min
+min_style          cg
+fix                1 all box/relax tri 0.0 vmax 0.01
+log logs/log.opt.${iter}
+log logs/log.opt.13
+unfix              1
+min_style          fire
+timestep           0.0005
+variable           tempstp     equal $(step)
+variable           tempstp     equal 127458
+variable           CellMinStep equal ${tempstp}
+variable           CellMinStep equal 127458
+log logs/log.opt.${iter}
+log logs/log.opt.13
+variable           AtomMinStep equal ${tempstp}
+variable           AtomMinStep equal 127458
+variable           temppe      equal $(pe)
+variable           temppe      equal 820.30905207972364224
+variable           min_E       equal abs(${prev_E}-${temppe})
+variable           min_E       equal abs(820.375954071467-${temppe})
+variable           min_E       equal abs(820.375954071467-820.309052079724)
+print "${iter} ${CellMinStep} ${AtomMinStep} ${AtomMinStep} $(pe) ${min_E}" append logs/minimization.txt screen no
+if "${min_E} < ${min_eval}" then "jump SELF break_min"
+variable    prev_E     equal ${temppe}
+variable    prev_E     equal 820.309052079724
+next        iter
+jump        SELF loop_min
+min_style          cg
+fix                1 all box/relax tri 0.0 vmax 0.01
+log logs/log.opt.${iter}
+log logs/log.opt.14
+unfix              1
+min_style          fire
+timestep           0.0005
+variable           tempstp     equal $(step)
+variable           tempstp     equal 147458
+variable           CellMinStep equal ${tempstp}
+variable           CellMinStep equal 147458
+log logs/log.opt.${iter}
+log logs/log.opt.14
+variable           AtomMinStep equal ${tempstp}
+variable           AtomMinStep equal 147458
+variable           temppe      equal $(pe)
+variable           temppe      equal 820.23749534291187047
+variable           min_E       equal abs(${prev_E}-${temppe})
+variable           min_E       equal abs(820.309052079724-${temppe})
+variable           min_E       equal abs(820.309052079724-820.237495342912)
+print "${iter} ${CellMinStep} ${AtomMinStep} ${AtomMinStep} $(pe) ${min_E}" append logs/minimization.txt screen no
+if "${min_E} < ${min_eval}" then "jump SELF break_min"
+variable    prev_E     equal ${temppe}
+variable    prev_E     equal 820.237495342912
+next        iter
+jump        SELF loop_min
+min_style          cg
+fix                1 all box/relax tri 0.0 vmax 0.01
+log logs/log.opt.${iter}
+log logs/log.opt.15
+unfix              1
+min_style          fire
+timestep           0.0005
+variable           tempstp     equal $(step)
+variable           tempstp     equal 157502
+variable           CellMinStep equal ${tempstp}
+variable           CellMinStep equal 157502
+log logs/log.opt.${iter}
+log logs/log.opt.15
+variable           AtomMinStep equal ${tempstp}
+variable           AtomMinStep equal 157502
+variable           temppe      equal $(pe)
+variable           temppe      equal 820.23513950680239759
+variable           min_E       equal abs(${prev_E}-${temppe})
+variable           min_E       equal abs(820.237495342912-${temppe})
+variable           min_E       equal abs(820.237495342912-820.235139506802)
+print "${iter} ${CellMinStep} ${AtomMinStep} ${AtomMinStep} $(pe) ${min_E}" append logs/minimization.txt screen no
+if "${min_E} < ${min_eval}" then "jump SELF break_min"
+jump SELF break_min
+#undump      traj_opti
+# start MD
+#dump        traj_frame structure custom ${ndump} movs/framework.lammpstrj element xs ys zs
+#dump_modify traj_frame element Zn  C  N  C  C  H  H  Ar  first yes sort id
+#dump        traj_guest guest     custom ${ndump} movs/guests.lammpstrj    element xs ys zs
+#dump_modify traj_guest element Zn  C  N  C  C  H  H  Ar  first yes sort id
+dump        traj_all   all       custom ${ndump} movs/all.lammpstrj       element xs ys zs
+dump        traj_all   all       custom 1000 movs/all.lammpstrj       element xs ys zs
+dump_modify traj_all   element Zn  C  N  C  C  H  H  Ar  first yes sort id
+reset_timestep 0
+#
+velocity    all scale ${TK}
+velocity    all scale 77
+variable    dt     equal 0.0005
+variable    tdamp  equal 100*${dt}
+variable    tdamp  equal 100*0.0005
+fix         2 all langevin ${TK} ${TK} ${tdamp} ${RandomSeed}
+fix         2 all langevin 77 ${TK} ${tdamp} ${RandomSeed}
+fix         2 all langevin 77 77 ${tdamp} ${RandomSeed}
+fix         2 all langevin 77 77 0.05 ${RandomSeed}
+fix         2 all langevin 77 77 0.05 1115111
+fix         3 all nve
+thermo      0
+log logs/log.nve
+unfix       2
+unfix       3
+fix         4 all npt temp ${TK} ${TK} ${tdamp} tri ${Pbar} ${Pbar} ${tdamp}
+fix         4 all npt temp 77 ${TK} ${tdamp} tri ${Pbar} ${Pbar} ${tdamp}
+fix         4 all npt temp 77 77 ${tdamp} tri ${Pbar} ${Pbar} ${tdamp}
+fix         4 all npt temp 77 77 0.05 tri ${Pbar} ${Pbar} ${tdamp}
+fix         4 all npt temp 77 77 0.05 tri 1.05 ${Pbar} ${tdamp}
+fix         4 all npt temp 77 77 0.05 tri 1.05 1.05 ${tdamp}
+fix         4 all npt temp 77 77 0.05 tri 1.05 1.05 0.05
+thermo      100
+log logs/log.npt
+unfix       4
+#undump traj_frame
+#undump traj_guest
+undump traj_all
+Total wall time: 2:35:07

@@ -1,0 +1,1 @@
+Zn   C1   N1   C2   C3   H2   H3   Ar  

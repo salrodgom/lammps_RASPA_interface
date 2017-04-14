@@ -1,0 +1,139 @@
+LAMMPS (31 Mar 2017)
+#
+units          metal
+boundary       p p p
+atom_style     full
+bond_style     harmonic
+angle_style    harmonic
+dihedral_style fourier
+improper_style cvff
+pair_style     lj/cut/coul/long 12.0
+kspace_style   ewald 1e-8
+read_data      SOD_ZIF_TOBUNPOROUS_Optimized.data
+  triclinic box = (0 0 0) to (30.6793 28.9245 25.0495) with tilt (-10.2262 -10.2262 -14.462)
+  1 by 1 by 1 MPI processor grid
+  reading atoms ...
+  816 atoms
+  scanning bonds ...
+  4 = max bonds/atom
+  scanning angles ...
+  12 = max angles/atom
+  scanning dihedrals ...
+  24 = max dihedrals/atom
+  scanning impropers ...
+  10 = max impropers/atom
+  reading bonds ...
+  960 bonds
+  reading angles ...
+  3440 angles
+  reading dihedrals ...
+  6136 dihedrals
+  reading impropers ...
+  4032 impropers
+  4 = max # of 1-2 neighbors
+  8 = max # of 1-3 neighbors
+  24 = max # of 1-4 neighbors
+  28 = max # of special neighbors
+pair_modify    mix arithmetic shift yes tail no table 0
+special_bonds  lj 0.0 0.0  0.00000 coul 0.0 0.0  0.00000
+set type 1 charge +0.6918 # Zn
+  48 settings made for charge
+set type 2 charge +0.2045 # C1
+  96 settings made for charge
+set type 3 charge -0.3879 # N1
+  192 settings made for charge
+set type 4 charge -0.0839 # C2
+  192 settings made for charge
+set type 5 charge +0.1310 # H1
+  96 settings made for charge
+set type 6 charge +0.1310 # H2
+  192 settings made for charge
+#
+variable    TK equal 300.0
+variable    RandomSeed equal 123456789
+#
+dump        traj_all   all     custom 100  all.lammpstrj       element xs ys zs
+dump_modify traj_all   element Zn C N C H H  first yes sort id
+dump        traj all xyz 10 traj.xyz
+dump_modify traj element Zn C N C H H
+#
+velocity    all create ${TK} ${RandomSeed}
+velocity    all create 300 ${RandomSeed}
+velocity    all create 300 123456789
+variable    dt     equal 0.0005
+variable    tdamp  equal 100*${dt}
+variable    tdamp  equal 100*0.0005
+fix         2 all langevin ${TK} ${TK} ${tdamp} ${RandomSeed}
+fix         2 all langevin 300 ${TK} ${tdamp} ${RandomSeed}
+fix         2 all langevin 300 300 ${tdamp} ${RandomSeed}
+fix         2 all langevin 300 300 0.05 ${RandomSeed}
+fix         2 all langevin 300 300 0.05 123456789
+fix         3 all nve
+thermo      100
+run         1000
+Ewald initialization ...
+WARNING: System is not charge neutral, net charge = -0.0192 (../kspace.cpp:302)
+WARNING: Using polynomial approximation for long-range coulomb (../kspace.cpp:321)
+  G vector (1/distance) = 0.30782
+  estimated absolute RMS force accuracy = 1.45472e-07
+  estimated relative force accuracy = 1.01025e-08
+  KSpace vectors: actual max1d max3d = 2976 19 29659
+                  kxmax kymax kzmax  = 12 14 19
+Neighbor list info ...
+  update every 1 steps, delay 10 steps, check yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 14
+  ghost atom cutoff = 14
+  binsize = 7, bins = 8 7 4
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair lj/cut/coul/long, perpetual
+      attributes: half, newton on
+      pair build: half/bin/newton/tri
+      stencil: half/bin/3d/newton/tri
+      bin: standard
+WARNING: Inconsistent image flags (../domain.cpp:785)
+Per MPI rank memory allocation (min/avg/max) = 58.01 | 58.01 | 58.01 Mbytes
+Step Temp E_pair E_mol TotEng Press 
+       0          300    74.424484    173.79426    279.82285   -46496.671 
+     100    331.12604    77.184507    76.115011    188.18266   -4627.6793 
+     200    314.12586     75.63649    66.119871    174.84858   -12245.115 
+     300    299.87884    74.846444    64.985363    171.42315    -11362.81 
+     400     300.0138    74.318527    65.960464    171.88455   -10614.496 
+     500     311.1362    73.786112    65.938936    172.50232   -11841.996 
+     600    303.70872    73.540866    65.819061    171.35474   -9837.6851 
+     700    308.17613    73.674832    65.774745    171.91501   -9805.7248 
+     800    309.87725    73.289918    67.501116    173.43568   -11185.523 
+     900    296.95482    73.308337    65.173557     169.7652   -10973.584 
+    1000    304.97926    72.827138    66.609849    171.56564   -10370.783 
+Loop time of 36.1591 on 1 procs for 1000 steps with 816 atoms
+
+Performance: 2.389 ns/day, 10.044 hours/ns, 27.656 timesteps/s
+99.9% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 8.267      | 8.267      | 8.267      |   0.0 | 22.86
+Bond    | 1.4541     | 1.4541     | 1.4541     |   0.0 |  4.02
+Kspace  | 26.026     | 26.026     | 26.026     |   0.0 | 71.98
+Neigh   | 0.15533    | 0.15533    | 0.15533    |   0.0 |  0.43
+Comm    | 0.057538   | 0.057538   | 0.057538   |   0.0 |  0.16
+Output  | 0.12439    | 0.12439    | 0.12439    |   0.0 |  0.34
+Modify  | 0.057807   | 0.057807   | 0.057807   |   0.0 |  0.16
+Other   |            | 0.01656    |            |       |  0.05
+
+Nlocal:    816 ave 816 max 816 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:    6472 ave 6472 max 6472 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:    165447 ave 165447 max 165447 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 165447
+Ave neighs/atom = 202.754
+Ave special neighs/atom = 12.9412
+Neighbor list builds = 12
+Dangerous builds = 0
+undump      traj_all
+undump      traj
+Total wall time: 0:00:36

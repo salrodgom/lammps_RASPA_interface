@@ -1,6 +1,7 @@
 SimulationType                MonteCarlo
 NumberOfCycles                20000
 NumberOfInitializationCycles  1000
+PrintPropertiesEvery          100
 PrintEvery                    100
 
 Forcefield                    Local
@@ -20,5 +21,5 @@ Component 0 MoleculeName               GUEST
             TranslationProbability     1.0
             RegrowProbability          1.0
             SwapProbability            1.0
+            WidomProbability           1.0
             CreateNumberOfMolecules    0
-

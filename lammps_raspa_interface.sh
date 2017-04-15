@@ -8,7 +8,7 @@ pressure=$3
 guest=$4
 MCCycles=1
 MCEMMDCycles=$5
-nCPU=3
+nCPU=16
 # Files:
 raspa_files_folder=$(pwd)/lib/fff_raspa
 lammps_files_folder=$(pwd)/lib/fff_lammps
@@ -83,6 +83,9 @@ function lammps_raspa {
  line=$(sed -n '/MODEL/{=;p}' out.pdb | sed '{N;s/\n/ /}' | tail -n1 | awk '{print $1}')
  end=$((n_lines - line + 1))
  tail -n$end out.pdb > input.pdb
+ # Remove guest!!!
+ sed -i '/ Ar /d' input.pdb
+ #
  ./pdb2cif 
  mv p1.cif ${CyclesNameFile}.cif
  cp ${CyclesNameFile}.cif ${CIFTemporallyFile}

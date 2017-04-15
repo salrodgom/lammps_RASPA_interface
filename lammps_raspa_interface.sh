@@ -3,12 +3,12 @@
 CIFFile=$1
 structure=$(echo $CIFFile | sed 's/\.cif//g')
 CIFTemporallyFile=${structure}_tmp.cif
-temperature=77
-pressure="1.05"
-guest="argon"
+temperature=$2
+pressure=$3
+guest=$4
 MCCycles=1
-MCEMMDCycles=1
-nCPU=16
+MCEMMDCycles=$5
+nCPU=3
 # Files:
 raspa_files_folder=$(pwd)/lib/fff_raspa
 lammps_files_folder=$(pwd)/lib/fff_lammps

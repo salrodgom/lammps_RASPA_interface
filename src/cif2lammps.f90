@@ -301,8 +301,6 @@ program zif_cif2gin
   do i=1,n_atoms
    if(atom(i)%new_label/="Xxxx")then
     atom(i)%label=atom(i)%new_label
-   !else
-   ! 
    end if
   end do 
   ! }}

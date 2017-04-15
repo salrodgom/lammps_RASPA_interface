@@ -26,8 +26,8 @@ variable ndump               equal 1000
 variable RandomSeed          equal 1115111
 variable Gnorm               equal 1e-2 #1.0e-4 #1e-6
 # ------------------------ Equilibration Run -------------------------------
-#dump        traj_opti structure custom ${ndump} movs/opti.lammpstrj element xs ys zs
-#dump_modify traj_opti element ELEMENTS first yes sort id
+dump        traj_opti all custom ${ndump} movs/opti.lammpstrj element xs ys zs
+dump_modify traj_opti element ELEMENTS first yes sort id
 print "MinStep CellMinStep AtomMinStep FinalStep Energy EDiff" file logs/minimization.txt screen no
 variable min_eval equal ${Gnorm}
 variable           prev_E     equal 50000.00
@@ -39,7 +39,8 @@ label              loop_min
 min_style          cg
 fix                1 all box/relax tri 0.0 vmax 0.01
 log logs/log.opt.${iter} 
-minimize           1.0e-15 1.0e-15 10000 100000
+#minimize           1.0e-15 1.0e-15 10000 100000
+minimize           1.0e-6 1.0e-6 1000 10000
 log logs/log.main append
 unfix              1
 min_style          fire
@@ -47,7 +48,8 @@ timestep           0.0005
 variable           tempstp     equal $(step)
 variable           CellMinStep equal ${tempstp}
 log logs/log.opt.${iter}
-minimize           1.0e-15 1.0e-15 10000 100000
+#minimize           1.0e-15 1.0e-15 10000 100000
+minimize           1.0e-6 1.0e-6 1000 10000
 log logs/log.main append
 variable           AtomMinStep equal ${tempstp}
 variable           temppe      equal $(pe)
@@ -58,7 +60,7 @@ variable    prev_E     equal ${temppe}
 next        iter
 jump        SELF loop_min
 label       break_min
-#undump      traj_opti
+undump      traj_opti
 # start MD
 #dump        traj_frame structure custom ${ndump} movs/framework.lammpstrj element xs ys zs
 #dump_modify traj_frame element ELEMENTS first yes sort id

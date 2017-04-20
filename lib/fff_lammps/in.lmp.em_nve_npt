@@ -1,0 +1,92 @@
+# FILENAME
+shell mkdir logs
+shell mkdir movs
+log        logs/log.main
+units      metal
+boundary   p p p
+atom_style full
+
+bond_style     harmonic
+angle_style    harmonic
+dihedral_style fourier
+improper_style none
+pair_style     lj/cut/coul/long 12.0
+kspace_style   ewald 1e-8
+read_data      FILENAME.lmp
+pair_modify    mix arithmetic shift yes tail no table 0
+special_bonds  lj 0.0 0.0  0.00000 coul 0.0 0.0  0.00000
+
+variable TK          equal   TEMPERATURE
+variable Pbar        equal   PRESSURE
+variable dt          equal       0.0005
+variable tdamp       equal     100*${dt}
+variable NumberOfNVEMDCycles equal 100000
+variable NumberOfNPTMDCycles equal 300000
+variable ndump               equal 1000
+variable RandomSeed          equal 1115111
+variable Gnorm               equal 1.0e-4 #1e-6
+# ------------------------ Equilibration Run -------------------------------
+dump        traj_opti all custom ${ndump} movs/opti.lammpstrj element xs ys zs
+dump_modify traj_opti element ELEMENTS first yes sort id
+print "MinStep CellMinStep AtomMinStep FinalStep Energy EDiff" file logs/minimization.txt screen no
+variable min_eval equal ${Gnorm}
+variable           prev_E     equal 50000.00
+variable           iter       loop 100000
+# loop min
+thermo             100
+thermo_style       one
+label              loop_min
+min_style          cg
+#fix                1 all box/relax tri 0.0 vmax 0.01 # conp in optimisation!
+log logs/log.opt.${iter} 
+#minimize           1.0e-15 1.0e-15 10000 100000
+minimize           1.0e-8 1.0e-8 1000 10000
+log logs/log.main append
+#unfix              1
+min_style          fire
+timestep           0.0005
+variable           tempstp     equal $(step)
+variable           CellMinStep equal ${tempstp}
+log logs/log.opt.${iter}
+#minimize           1.0e-15 1.0e-15 10000 100000
+minimize           1.0e-8 1.0e-8 1000 10000
+log logs/log.main append
+variable           AtomMinStep equal ${tempstp}
+variable           temppe      equal $(pe)
+variable           min_E       equal abs(${prev_E}-${temppe})
+print "${iter} ${CellMinStep} ${AtomMinStep} ${AtomMinStep} $(pe) ${min_E}" append logs/minimization.txt screen no
+if "${min_E} < ${min_eval}" then "jump SELF break_min"
+variable    prev_E     equal ${temppe}
+next        iter
+jump        SELF loop_min
+label       break_min
+undump      traj_opti
+# start MD
+#dump        traj_frame structure custom ${ndump} movs/framework.lammpstrj element xs ys zs
+#dump_modify traj_frame element ELEMENTS first yes sort id
+#dump        traj_guest guest     custom ${ndump} movs/guests.lammpstrj    element xs ys zs
+#dump_modify traj_guest element ELEMENTS first yes sort id
+dump        traj_all   all       custom ${ndump} movs/all.lammpstrj       element xs ys zs
+dump_modify traj_all   element ELEMENTS first yes sort id
+reset_timestep 0
+# 
+velocity    all scale ${TK}
+variable    dt     equal 0.0005
+variable    tdamp  equal 100*${dt}
+fix         2 all langevin ${TK} ${TK} ${tdamp} ${RandomSeed}
+fix         3 all nve
+thermo      0
+log logs/log.nve
+run         ${NumberOfNVEMDCycles}
+log logs/log.main append
+unfix       2
+unfix       3
+fix         4 all npt temp ${TK} ${TK} ${tdamp} tri ${Pbar} ${Pbar} ${tdamp}
+thermo      100
+log logs/log.npt
+run         ${NumberOfNPTMDCycles}
+log logs/log.main append
+unfix       4
+#undump traj_frame
+#undump traj_guest
+undump traj_all

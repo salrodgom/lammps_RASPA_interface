@@ -20,11 +20,11 @@ variable TK          equal   TEMPERATURE
 variable Pbar        equal   PRESSURE
 variable dt          equal       0.0005
 variable tdamp       equal     100*${dt}
-variable NumberOfNVEMDCycles equal 200000
-variable NumberOfNPTMDCycles equal 1800000
+variable NumberOfNVEMDCycles equal 100000
+variable NumberOfNPTMDCycles equal 300000
 variable ndump               equal 1000
 variable RandomSeed          equal 1115111
-variable Gnorm               equal 1e-2 #1.0e-4 #1e-6
+variable Gnorm               equal 1.0e-4 #1e-6
 # ------------------------ Equilibration Run -------------------------------
 dump        traj_opti all custom ${ndump} movs/opti.lammpstrj element xs ys zs
 dump_modify traj_opti element ELEMENTS first yes sort id
@@ -40,7 +40,7 @@ min_style          cg
 fix                1 all box/relax tri 0.0 vmax 0.01
 log logs/log.opt.${iter} 
 #minimize           1.0e-15 1.0e-15 10000 100000
-minimize           1.0e-6 1.0e-6 1000 10000
+minimize           1.0e-8 1.0e-8 1000 10000
 log logs/log.main append
 unfix              1
 min_style          fire
@@ -49,7 +49,7 @@ variable           tempstp     equal $(step)
 variable           CellMinStep equal ${tempstp}
 log logs/log.opt.${iter}
 #minimize           1.0e-15 1.0e-15 10000 100000
-minimize           1.0e-6 1.0e-6 1000 10000
+minimize           1.0e-8 1.0e-8 1000 10000
 log logs/log.main append
 variable           AtomMinStep equal ${tempstp}
 variable           temppe      equal $(pe)

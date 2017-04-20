@@ -14,6 +14,29 @@ raspa_files_folder=$(pwd)/lib/fff_raspa
 lammps_files_folder=$(pwd)/lib/fff_lammps
 src_files_folder=$(pwd)/src
 # Functions:
+function check_supercell {
+ cutoff=12.0
+ ua=1
+ ub=1
+ uc=1
+ a_cell=$(grep "_cell_length_a" $CIFTemporallyFile | awk '{print $2}')
+ b_cell=$(grep "_cell_length_b" $CIFTemporallyFile | awk '{print $2}')
+ c_cell=$(grep "_cell_length_c" $CIFTemporallyFile | awk '{print $2}')
+ a_cell=$(echo "$ua*$a_cell" | bc -l)
+ while [ $(echo "$a_cell < 2*$cutoff" | bc -l) == 1 ] ; do
+  let "ua++"
+  a_cell=$(echo "$ua*$a_cell" | bc -l)
+ done
+ while [ $(echo "$b_cell < 2*$cutoff" | bc -l) == 1 ] ; do
+  let "ub++"
+  b_cell=$(echo "$ub*$b_cell" | bc -l)
+ done
+ while [ $(echo "$c_cell < 2*$cutoff" | bc -l) == 1 ] ; do
+  let "uc++"
+  c_cell=$(echo "$uc*$c_cell" | bc -l)
+ done
+ echo "Make Supercell: ${ua}x${ub}x${uc} > $a_cell $b_cell $c_cell"
+}
 function mc_raspa {
  # mu V T
  # RASPA
@@ -32,7 +55,8 @@ function mc_raspa {
     sed -i "s/TEMPERATURE/${temperature}/g" simulation.input
     sed -i "s/PRESSURE/${pressure}/g" simulation.input
     sed -i "s/GUEST/${guest}/g" simulation.input
-    sed -i "s/SUPERCELL/2 2 2/g" simulation.input
+    check_supercell
+    sed -i "s/SUPERCELL/$ua $ub $uc/g" simulation.input
     simulate > /dev/null
     sed '/MODEL    2/,$d' Movies/System_0/Movie*allcomponents.pdb > c
     sed 's/MODEL    2/MODEL    1/g' c > ../${CyclesNameFile}.pdb

@@ -1,5 +1,11 @@
-#/bin/bash -x
-# Inputs:
+#/bin/bash
+# ==================================================================
+# Author:  Salvador Rodriguez-Gomez Balestra
+# License: MIT License
+# ==================================================================
+
+# Inputs:  CIF, Temperature, Pressure, Guest_Molecule, #MCEMMDCycles
+# ==================================================================
 CIFFile=$1
 structure=$(echo $CIFFile | sed 's/\.cif//g')
 CIFTemporallyFile=${structure}_tmp.cif
@@ -13,8 +19,12 @@ nCPU=16
 raspa_files_folder=$(pwd)/lib/fff_raspa
 lammps_files_folder=$(pwd)/lib/fff_lammps
 src_files_folder=$(pwd)/src
+
+
 # Functions:
+# ==========
 function check_supercell {
+# Check cell size for correct calculation of energies considering cutoff
  cutoff=12.0
  ua=1
  ub=1
@@ -37,8 +47,9 @@ function check_supercell {
  done
  echo "Make Supercell: ${ua}x${ub}x${uc} > $a_cell $b_cell $c_cell"
 }
-function mc_raspa {
- # mu V T
+
+function mc_muVT_raspa {
+ # mu V T, ensemble
  # RASPA
  for i in $(seq 1 ${MCCycles}) ; do
   iname=$(echo $i | awk '{ printf("%02d\n", $1) }')
@@ -66,22 +77,28 @@ function mc_raspa {
   fi
  done
 }
+
 function make_binaries {
+# Make binaries
  cp ${src_files_folder}/*.f90 .
  cp ${src_files_folder}/Makefile .
  make install
 }
+
 function clean_binaries {
  make clean
 }
+
 function count_used_CPUs {
+# 
  n_used=0
  for process in "simulate" "lmp_mpi" "gulp" ; do
   n=$(ps aux | grep ${process} | sed '/grep/d' | wc -l | awk '{print $1}')
   n_used=$((${n}+${n_used}))
  done
 }
-function go_raspa     {
+
+function go_raspa {
  count_used_CPUs
  while [ $(echo "${n_used} >= ${nCPU}" | bc -l) == 1 ] ; do
   sleep 30
@@ -89,7 +106,8 @@ function go_raspa     {
  done
  simulate > /dev/null
 }
-function go_lammps    {
+
+function go_lammps {
  count_used_CPUs
  while [ $(echo "${n_used} >= ${nCPU}" | bc -l) == 1 ] ; do
   sleep 30
@@ -97,6 +115,7 @@ function go_lammps    {
  done
  mpirun --np $((${nCPU}-2)) lmp_mpi -in in.lmp -sf opt
 }
+
 function em_md_lammps {
  # Optimization
  # NVE
@@ -115,6 +134,7 @@ function em_md_lammps {
   go_lammps
  cd ..
 }
+
 function raspa_lammps {
  cp ${CyclesNameFile}.pdb input.pdb
  ./pdb2cif
@@ -124,6 +144,7 @@ function raspa_lammps {
  ./cif2lammps -c ${CyclesNameFile}.cif -wq -S
  mv ${CyclesNameFile}.data ${CyclesNameFile}.lmp
 }
+
 function lammps_raspa {
  ./lammpstrj2pdb < $folder/movs/all.lammpstrj
  n_lines=$(wc -l out.pdb |awk '{print $1}')
@@ -144,7 +165,7 @@ cp ${CIFFile} ${CIFTemporallyFile}
 for cycle in $(seq 1 ${MCEMMDCycles}) ; do
   cycle_name=$(echo $cycle | awk '{ printf("%02d\n", $1) }')
   make_binaries
-  mc_raspa
+  mc_muVT_raspa
   raspa_lammps
   em_md_lammps
   lammps_raspa

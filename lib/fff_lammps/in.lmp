@@ -26,17 +26,15 @@ variable ndump               equal 1000
 variable RandomSeed          equal 1115111
 variable Gnorm               equal 1.0e-4 #1e-6
 # ------------------------ Equilibration Run -------------------------------
-dump        traj_opti all custom ${ndump} movs/opti.lammpstrj element xs ys zs
-dump_modify traj_opti element ELEMENTS first yes sort id
 # start MD
 dump        traj_all   all       custom ${ndump} movs/all.lammpstrj       element xs ys zs
 dump_modify traj_all   element ELEMENTS first yes sort id
 reset_timestep 0
 # 
-velocity    all scale ${TK}
+velocity    all create ${TK} ${RandomSeed}
 fix         2 all langevin ${TK} ${TK} ${tdamp} ${RandomSeed}
 fix         3 all nve
-thermo      0
+thermo      100
 log logs/log.nve
 run         ${NumberOfNVEMDCycles}
 log logs/log.main append

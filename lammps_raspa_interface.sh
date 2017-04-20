@@ -23,6 +23,14 @@ src_files_folder=$(pwd)/src
 
 # Functions:
 # ==========
+function raspa {
+ nohup simulate > /dev/null &
+}
+
+function lammps {
+ nohup mpirun --np $((${nCPU}-2)) lmp_mpi -in in.lmp -sf opt &
+}
+
 function check_supercell {
 # Check cell size for correct calculation of energies considering cutoff
  cutoff=12.0
@@ -69,6 +77,7 @@ function mc_muVT_raspa {
     check_supercell
     sed -i "s/SUPERCELL/$ua $ub $uc/g" simulation.input
     go_raspa
+    wait_for_raspa
     sed '/MODEL    2/,$d' Movies/System_0/Movie*allcomponents.pdb > c
     sed 's/MODEL    2/MODEL    1/g' c > ../${CyclesNameFile}.pdb
     rm c
@@ -104,7 +113,16 @@ function go_raspa {
   sleep 30
   count_used_CPUs
  done
- simulate > /dev/null
+ raspa
+ sleep 1
+}
+
+function wait_for_raspa {
+ raspa_end=$(grep "Simulation finished" Output/System_0/output_*.data | wc -l | awk '{print $1}')
+ while [ $(echo $raspa_end < 1 | bc -l) == 1 ] ; do
+  sleep 30
+  raspa_end=$(grep "Simulation finished" Output/System_0/output_*.data | wc -l | awk '{print $1}')
+ done
 }
 
 function go_lammps {
@@ -113,7 +131,16 @@ function go_lammps {
   sleep 30
   count_used_CPUs
  done
- mpirun --np $((${nCPU}-2)) lmp_mpi -in in.lmp -sf opt
+ lammps
+ sleep 1
+}
+
+function wait_for_lammps {
+ lammps_end=$( grep "Total wall time:" logs/log.main | wc -l | awk '{print $1}')
+ while [ $(echo ${lammps_end} < 1 | bc -l) == 1 ] ; do
+  sleep 30
+  lammps_end=$( grep "Total wall time:" logs/log.main | wc -l | awk '{print $1}')
+ done
 }
 
 function em_md_lammps {
@@ -121,18 +148,21 @@ function em_md_lammps {
  # NVE
  # NPTPR
  folder=${CyclesNameFile}_emmd
- mkdir $folder
- cp ${CyclesNameFile}.lmp $folder/.
- cp ${lammps_files_folder}/in.lmp $folder/in.lmp
- cp atom_types_for_dump.txt $folder/.
- cd $folder
-  sed -i "s/TEMPERATURE/${temperature}/g" in.lmp
-  sed -i "s/PRESSURE/${pressure}/g" in.lmp
-  sed -i "s/FILENAME/${CyclesNameFile}/g" in.lmp
-  elements=$(cat atom_types_for_dump.txt | sed 's/[0-9]//g' | sed 's/  / /g')
-  sed -i "s/ELEMENTS/${elements}/g" in.lmp
-  go_lammps
- cd ..
+ if [ ! -d $folder ] ; then 
+  mkdir $folder
+  cp ${CyclesNameFile}.lmp $folder/.
+  cp ${lammps_files_folder}/in.lmp $folder/in.lmp
+  cp atom_types_for_dump.txt $folder/.
+  cd $folder
+   sed -i "s/TEMPERATURE/${temperature}/g" in.lmp
+   sed -i "s/PRESSURE/${pressure}/g" in.lmp
+   sed -i "s/FILENAME/${CyclesNameFile}/g" in.lmp
+   elements=$(cat atom_types_for_dump.txt | sed 's/[0-9]//g' | sed 's/  / /g')
+   sed -i "s/ELEMENTS/${elements}/g" in.lmp
+   go_lammps
+   wait_for_lammps
+  cd ..
+ fi
 }
 
 function raspa_lammps {

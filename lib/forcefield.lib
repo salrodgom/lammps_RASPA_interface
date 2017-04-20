@@ -126,6 +126,7 @@ H2   H2    lj/cut          0.0279      2.571
 H1   H1    lj/cut          0.0279      2.571
 H3   H3    lj/cut          0.0279      2.571
 Ar   Ar    lj/cut          0.996066    3.34  # RASPA: GenericMOFs forcefield
+C84  C84   lj/cut          0.294104    3.73  # WHCJ: 10.1039/c4ra00664j
 #Ar   Ar    lj/cut          3.41 # Tanaka et al. doi:10.1021/jp500931g
 #
 End  

@@ -186,6 +186,8 @@ function lammps_raspa {
  tail -n$end out.pdb > input.pdb
  # Remove guest!!!
  sed -i '/ Ar /d' input.pdb
+ sed -i '/ Xe /d' input.pdb
+ sed -i '/ Kr /d' input.pdb
  #
  ./pdb2cif 
  mv p1.cif ${CyclesNameFile}.cif

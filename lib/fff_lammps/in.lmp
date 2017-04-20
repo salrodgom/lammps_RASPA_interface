@@ -23,7 +23,7 @@ variable tdamp       equal     100*${dt}
 variable NumberOfNVEMDCycles equal 100000
 variable NumberOfNVTMDCycles equal 300000
 variable ndump               equal 1000
-variable RandomSeed          equal 1115111
+variable RandomSeed          equal RANDOMSEED
 variable Gnorm               equal 1.0e-4 #1e-6
 # ------------------------ Equilibration Run -------------------------------
 # start MD

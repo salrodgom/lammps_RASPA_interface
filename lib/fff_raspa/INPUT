@@ -3,7 +3,7 @@ NumberOfCycles                10000
 NumberOfInitializationCycles  1000
 PrintPropertiesEvery          100
 PrintEvery                    100
-
+RandomSeed                    RANDOMSEED
 Forcefield                    Local
 CutOff                        16.709 # sigma*4.9 # Tanaka et al.
 ChargeMethod                  None

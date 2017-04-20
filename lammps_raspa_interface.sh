@@ -8,7 +8,8 @@
 # ==================================================================
 CIFFile=$1
 structure=$(echo $CIFFile | sed 's/\.cif//g')
-CIFTemporallyFile=${structure}_tmp.cif
+seed=$(od --read-bytes=4 --address-radix=n --format=uL /dev/urandom | tr --delete " ")
+CIFTemporallyFile=${structure}_${seed}.cif
 temperature=$2
 pressure=$3
 guest=$4
@@ -62,7 +63,7 @@ function mc_muVT_raspa {
  for i in $(seq 1 ${MCCycles}) ; do
   iname=$(echo $i | awk '{ printf("%02d\n", $1) }')
   NewNameFile=${structure}_${guest}_${pressure}_${temperature}
-  CyclesNameFile=${cycle_name}_${iname}_${NewNameFile}
+  CyclesNameFile=${cycle_name}_${iname}_${NewNameFile}_${seed}
   folder=${CyclesNameFile}_adsorption
   if [ ! -d $folder ] ; then
    mkdir $folder
@@ -70,7 +71,8 @@ function mc_muVT_raspa {
    cp ${raspa_files_folder}/INPUT ${folder}
    cp $CIFTemporallyFile $folder
    cd $folder
-    sed "s/STRUCTURE/${structure}_tmp/g" INPUT > simulation.input
+    sed "s/STRUCTURE/${structure}_${seed}/g" INPUT > simulation.input
+    sed -i "s/RANDOMSEED/${seed}/g"         simulation.input
     sed -i "s/TEMPERATURE/${temperature}/g" simulation.input
     sed -i "s/PRESSURE/${pressure}/g" simulation.input
     sed -i "s/GUEST/${guest}/g" simulation.input
@@ -119,7 +121,7 @@ function go_raspa {
 
 function wait_for_raspa {
  raspa_end=$(grep "Simulation finished" Output/System_0/output_*.data | wc -l | awk '{print $1}')
- while [ $(echo $raspa_end < 1 | bc -l) == 1 ] ; do
+ while [ $(echo "$raspa_end < 1" | bc -l) == 1 ] ; do
   sleep 30
   raspa_end=$(grep "Simulation finished" Output/System_0/output_*.data | wc -l | awk '{print $1}')
  done
@@ -137,7 +139,7 @@ function go_lammps {
 
 function wait_for_lammps {
  lammps_end=$( grep "Total wall time:" logs/log.main | wc -l | awk '{print $1}')
- while [ $(echo ${lammps_end} < 1 | bc -l) == 1 ] ; do
+ while [ $(echo "${lammps_end} < 1" | bc -l) == 1 ] ; do
   sleep 30
   lammps_end=$( grep "Total wall time:" logs/log.main | wc -l | awk '{print $1}')
  done
@@ -155,6 +157,7 @@ function em_md_lammps {
   cp atom_types_for_dump.txt $folder/.
   cd $folder
    sed -i "s/TEMPERATURE/${temperature}/g" in.lmp
+   sed -i "s/RANDOMSEED/${seed}/g"   in.lmp
    sed -i "s/PRESSURE/${pressure}/g" in.lmp
    sed -i "s/FILENAME/${CyclesNameFile}/g" in.lmp
    elements=$(cat atom_types_for_dump.txt | sed 's/[0-9]//g' | sed 's/  / /g')
@@ -188,6 +191,7 @@ function lammps_raspa {
  mv p1.cif ${CyclesNameFile}.cif
  cp ${CyclesNameFile}.cif ${CIFTemporallyFile}
 }
+
 ##############################################################
 # main program:
 ##############################################################

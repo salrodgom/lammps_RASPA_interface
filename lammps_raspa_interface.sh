@@ -8,7 +8,12 @@
 # ==================================================================
 CIFFile=$1
 structure=$(echo $CIFFile | sed 's/\.cif//g')
-seed=$(od --read-bytes=4 --address-radix=n --format=uL /dev/urandom | tr --delete " ")
+# choose a seed for coding the IO properly:
+seed=$(od --read-bytes=3 --address-radix=n --format=uL /dev/urandom | tr --delete " ")
+while [ $(echo "$seed > 900000000" | bc -l) == 1 ] || [ $(echo "$seed < 0" | bc -l) == 1 ] ; do
+ seed=$(od --read-bytes=3 --address-radix=n --format=uL /dev/urandom | tr --delete " ")
+ sleep 0.5
+done
 CIFTemporallyFile=${structure}_${seed}.cif
 temperature=$2
 pressure=$3
@@ -69,7 +74,7 @@ function mc_muVT_raspa {
    mkdir $folder
    cp ${raspa_files_folder}/*.def $folder
    cp ${raspa_files_folder}/INPUT ${folder}
-   cp $CIFTemporallyFile $folder
+   cp ${CIFTemporallyFile} $folder
    cd $folder
     sed "s/STRUCTURE/${structure}_${seed}/g" INPUT > simulation.input
     sed -i "s/RANDOMSEED/${seed}/g"         simulation.input
@@ -111,7 +116,7 @@ function count_used_CPUs {
 
 function go_raspa {
  count_used_CPUs
- while [ $(echo "${n_used} >= ${nCPU}" | bc -l) == 1 ] ; do
+ while [ $(echo "${n_used} >= 2" | bc -l) == 1 ] ; do
   sleep 30
   count_used_CPUs
  done

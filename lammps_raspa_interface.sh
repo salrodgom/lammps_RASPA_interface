@@ -57,7 +57,7 @@ function mc_raspa {
     sed -i "s/GUEST/${guest}/g" simulation.input
     check_supercell
     sed -i "s/SUPERCELL/$ua $ub $uc/g" simulation.input
-    simulate > /dev/null
+    go_raspa
     sed '/MODEL    2/,$d' Movies/System_0/Movie*allcomponents.pdb > c
     sed 's/MODEL    2/MODEL    1/g' c > ../${CyclesNameFile}.pdb
     rm c
@@ -74,6 +74,29 @@ function make_binaries {
 function clean_binaries {
  make clean
 }
+function count_used_CPUs {
+ n_used=0
+ for process in "simulate" "lmp_mpi" "gulp" ; do
+  n=$(ps aux | grep ${process} | sed '/grep/d' | wc -l | awk '{print $1}')
+  n_used=$((${n}+${n_used}))
+ done
+}
+function go_raspa     {
+ count_used_CPUs
+ while [ $(echo "${n_used} >= ${nCPU}" | bc -l) == 1 ] ; do
+  sleep 30
+  count_used_CPUs
+ done
+ simulate > /dev/null
+}
+function go_lammps    {
+ count_used_CPUs
+ while [ $(echo "${n_used} >= ${nCPU}" | bc -l) == 1 ] ; do
+  sleep 30
+  count_used_CPUs
+ done
+ mpirun --np $((${nCPU}-2)) lmp_mpi -in in.lmp -sf opt
+}
 function em_md_lammps {
  # Optimization
  # NVE
@@ -89,7 +112,7 @@ function em_md_lammps {
   sed -i "s/FILENAME/${CyclesNameFile}/g" in.lmp
   elements=$(cat atom_types_for_dump.txt | sed 's/[0-9]//g' | sed 's/  / /g')
   sed -i "s/ELEMENTS/${elements}/g" in.lmp
-  mpirun --np $nCPU lmp_mpi -in in.lmp -sf opt
+  go_lammps
  cd ..
 }
 function raspa_lammps {

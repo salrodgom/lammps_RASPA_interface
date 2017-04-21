@@ -19,6 +19,12 @@ temperature=$2
 pressure=$3
 guest=$4
 MCCycles=1
+# MC
+CyclesEvery=5000
+InitCycles=$(echo "$CyclesEvery * 0.1" | bc -l | sed 's/\./ /g' | awk '{print $1}')
+MoviesEvery=$((CyclesEvery - 1))
+# MD
+# ...
 MCEMMDCycles=$5
 nCPU=16
 # Files:
@@ -81,6 +87,9 @@ function mc_muVT_raspa {
     sed -i "s/TEMPERATURE/${temperature}/g" simulation.input
     sed -i "s/PRESSURE/${pressure}/g" simulation.input
     sed -i "s/GUEST/${guest}/g" simulation.input
+    sed -i "s/CYCLESEVERY/${CyclesEvery}/g" simulation.input
+    sed -i "s/INITCYCLES/${InitCycles}/g" simulation.input
+    sed -i "s/MOVIESEVERY/${MoviesEvery}/g" simulation.input
     check_supercell
     sed -i "s/SUPERCELL/$ua $ub $uc/g" simulation.input
     go_raspa
@@ -116,7 +125,7 @@ function count_used_CPUs {
 
 function go_raspa {
  count_used_CPUs
- while [ $(echo "${n_used} >= 2" | bc -l) == 1 ] ; do
+ while [ $(echo "${n_used} >= ${nCPU}" | bc -l) == 1 ] ; do
   sleep 30
   count_used_CPUs
  done
@@ -157,9 +166,12 @@ function em_md_lammps {
  folder=${CyclesNameFile}_emmd
  if [ ! -d $folder ] ; then 
   mkdir $folder
-  cp ${CyclesNameFile}.lmp $folder/.
+  mv ${CyclesNameFile}.lmp $folder/.
+  mv ${CyclesNameFile}.gin $folder/.
+  mv ${CyclesNameFile}.pdb $folder/.
+  mv ${CyclesNameFile}.cif $folder/.
   cp ${lammps_files_folder}/in.lmp $folder/in.lmp
-  cp atom_types_for_dump.txt $folder/.
+  mv atom_types_for_dump.txt $folder/.
   cd $folder
    sed -i "s/TEMPERATURE/${temperature}/g" in.lmp
    sed -i "s/RANDOMSEED/${seed}/g"   in.lmp
@@ -181,6 +193,7 @@ function raspa_lammps {
  cp lib/forcefield.lib .
  ./cif2lammps -c ${CyclesNameFile}.cif -wq -S
  mv ${CyclesNameFile}.data ${CyclesNameFile}.lmp
+ rm input.pdb
 }
 
 function lammps_raspa {
@@ -197,6 +210,7 @@ function lammps_raspa {
  ./pdb2cif 
  mv p1.cif ${CyclesNameFile}.cif
  cp ${CyclesNameFile}.cif ${CIFTemporallyFile}
+ rm input.pdb
 }
 
 ##############################################################

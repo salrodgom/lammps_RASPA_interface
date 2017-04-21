@@ -35,18 +35,17 @@ velocity    all create ${TK} ${RandomSeed}
 fix         2 all langevin ${TK} ${TK} ${tdamp} ${RandomSeed}
 fix         3 all nve
 thermo      100
-log logs/log.nve
+log logs/log.nvt
 run         ${NumberOfNVEMDCycles}
 log logs/log.main append
 unfix       2
 unfix       3
-fix         4 all nvt temp ${TK} ${TK} ${tdamp}
-#tri ${Pbar} ${Pbar} ${tdamp}
+fix         4 all npt temp ${TK} ${TK} ${tdamp} tri ${Pbar} ${Pbar} ${tdamp}
 thermo      100
-log logs/log.nvt
+log logs/log.npt
 run         ${NumberOfNPTMDCycles}
 log logs/log.main append
 unfix       4
-#undump traj_frame
-#undump traj_guest
 undump traj_all
+log log/log.main
+print "Simulation finished"

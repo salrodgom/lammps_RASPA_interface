@@ -1,0 +1,29 @@
+#CoreShells bond  BondDipoles UreyBradley bend  inv  tors improper-torsion bond/bond bond/bend bend/bend stretch/torsion bend/torsion
+          0    5            0           0    7    0     8                3         0         0         0               0            0
+#bond stretch atom n1-n2, equilibrium distance, bondforce-constant
+C3 H1  FIXED_BOND   0.95
+C3 C3  FIXED_BOND   1.36
+C2 C3  FIXED_BOND   1.36
+C1 C2  FIXED_BOND   1.42
+O2 C1  FIXED_BOND   1.25
+#bond bending atom n1-n2-n3, equilibrium angle, bondforce-constant
+C1 C2 C3 FIXED_BEND    120.0
+C2 C3 H1 FIXED_BEND    120.0
+C3 C3 H1 FIXED_BEND    120.0
+C3 C2 C3 FIXED_BEND    120.0
+C3 C3 C2 FIXED_BEND    120.0
+O2 C1 O2 FIXED_BEND    130.0
+O2 C1 C2 FIXED_BEND    115.0
+#torsion atom n1-n2-n3-n4,
+O2 C1 C2  C3  TRAPPE_DIHEDRAL      0.0   0.0   1258.890391861  0.0
+C1 C2 C3  H1  TRAPPE_DIHEDRAL      0.0   0.0   1510.668470234  0.0
+C1 C2 C3  C3  TRAPPE_DIHEDRAL      0.0   0.0   1510.668470234  0.0
+H1 C3 C3  H1  TRAPPE_DIHEDRAL      0.0   0.0   1510.668470234  0.0
+C2 C3 C3  H1  TRAPPE_DIHEDRAL      0.0   0.0   1510.668470234  0.0
+C2 C3 C3  C2  TRAPPE_DIHEDRAL      0.0   0.0   1510.668470234  0.0
+H1 C3 C2  C3  TRAPPE_DIHEDRAL      0.0   0.0   1510.668470234  0.0
+C3 C2 C3  C3  TRAPPE_DIHEDRAL      0.0   0.0   1510.668470234  0.0
+#improper torsion atom n1-n2-n3-n4,
+C2 C1 O2  O2  TRAPPE_IMPROPER_DIHEDRAL 0.0 0.0   5035.561567446  0.0
+C3 C2 C3  C1  TRAPPE_IMPROPER_DIHEDRAL 0.0 0.0   5035.561567446  0.0
+C2 C3 C3  H1  TRAPPE_IMPROPER_DIHEDRAL 0.0 0.0   186.3157779955  0.0

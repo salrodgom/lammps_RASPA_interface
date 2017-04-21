@@ -17,35 +17,33 @@ pair_modify    mix arithmetic shift yes tail no table 0
 special_bonds  lj 0.0 0.0  0.00000 coul 0.0 0.0  0.00000
 
 variable TK          equal   TEMPERATURE
-variable Pbar        equal   PRESSURE
-variable dt          equal       0.001
-variable tdamp       equal     100*${dt}
+variable Pbar        equal   0.0
+variable dt          equal   0.0005
+variable tdamp       equal   100*${dt}
 variable NumberOfNVEMDCycles equal 100000
-variable NumberOfNVTMDCycles equal 300000
+variable NumberOfNPTMDCycles equal 300000
 variable ndump               equal 1000
 variable RandomSeed          equal RANDOMSEED
 variable Gnorm               equal 1.0e-4 #1e-6
 # ------------------------ Equilibration Run -------------------------------
-# start MD
 dump        traj_all   all       custom ${ndump} movs/all.lammpstrj       element xs ys zs
 dump_modify traj_all   element ELEMENTS first yes sort id
 reset_timestep 0
 # 
-velocity    all create ${TK} ${RandomSeed}
-fix         2 all langevin ${TK} ${TK} ${tdamp} ${RandomSeed}
-fix         3 all nve
-thermo      100
-log logs/log.nvt
-run         ${NumberOfNVEMDCycles}
-log logs/log.main append
-unfix       2
-unfix       3
-fix         4 all npt temp ${TK} ${TK} ${tdamp} tri ${Pbar} ${Pbar} ${tdamp}
-thermo      100
-log logs/log.npt
-run         ${NumberOfNPTMDCycles}
-log logs/log.main append
-unfix       4
-undump traj_all
-log log/log.main
+velocity all create ${TK} ${RandomSeed}
+fix      2 all langevin ${TK} ${TK} ${tdamp} ${RandomSeed}
+fix      3 all nve
+thermo   100
+log      logs/log.nvt
+run      ${NumberOfNVEMDCycles}
+log      logs/log.main append
+unfix    2
+unfix    3
+fix      4 all npt temp ${TK} ${TK} ${tdamp} tri ${Pbar} ${Pbar} ${tdamp}
+thermo   100
+log      logs/log.npt
+run      ${NumberOfNPTMDCycles}
+log      logs/log.main append
+unfix    4
+undump   traj_all
 print "Simulation finished"

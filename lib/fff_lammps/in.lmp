@@ -20,11 +20,42 @@ variable TK          equal   TEMPERATURE
 variable Pbar        equal   0.0
 variable dt          equal   0.0005
 variable tdamp       equal   100*${dt}
-variable NumberOfNVEMDCycles equal 100000
-variable NumberOfNPTMDCycles equal 300000
+variable NumberOfNVEMDCycles equal 400000
+variable NumberOfNPTMDCycles equal 800000 
 variable ndump               equal 1000
 variable RandomSeed          equal RANDOMSEED
 variable Gnorm               equal 1.0e-4 #1e-6
+# ------------------------ Optimisation Run -------------------------------
+dump        traj_opti all custom ${ndump} movs/opti.lammpstrj element xs ys zs
+dump_modify traj_opti element ELEMENTS  first yes sort id
+print "MinStep CellMinStep AtomMinStep FinalStep Energy EDiff" file logs/minimization.txt screen no
+variable min_eval equal ${Gnorm}
+variable           prev_E     equal 50000.00
+variable           iter       loop 100000
+thermo             100
+thermo_style       one
+label              loop_min
+min_style          cg
+log logs/log.opt.${iter}
+minimize           1.0e-8 1.0e-8 1000 10000
+log logs/log.main append
+min_style          fire
+timestep           0.0005
+variable           tempstp     equal $(step)
+variable           CellMinStep equal ${tempstp}
+log logs/log.opt.${iter}
+minimize           1.0e-8 1.0e-8 1000 10000
+log logs/log.main append
+variable           AtomMinStep equal ${tempstp}
+variable           temppe      equal $(pe)
+variable           min_E       equal abs(${prev_E}-${temppe})
+print "${iter} ${CellMinStep} ${AtomMinStep} ${AtomMinStep} $(pe) ${min_E}" append logs/minimization.txt screen no
+if "${min_E} < ${min_eval}" then "jump SELF break_min"
+variable    prev_E     equal ${temppe}
+next        iter
+jump        SELF loop_min
+label       break_min
+undump      traj_opti
 # ------------------------ Equilibration Run -------------------------------
 dump        traj_all   all       custom ${ndump} movs/all.lammpstrj       element xs ys zs
 dump_modify traj_all   element ELEMENTS first yes sort id

@@ -20,8 +20,8 @@ variable TK          equal   TEMPERATURE
 variable Pbar        equal   0.0
 variable dt          equal   0.0005
 variable tdamp       equal   100*${dt}
-variable NumberOfNVEMDCycles equal 400000
-variable NumberOfNPTMDCycles equal 800000 
+variable NumberOfNVEMDCycles equal 100000
+variable NumberOfNPTMDCycles equal 400000 
 variable ndump               equal 1000
 variable RandomSeed          equal RANDOMSEED
 variable Gnorm               equal 1.0e-4 #1e-6

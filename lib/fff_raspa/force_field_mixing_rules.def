@@ -16,7 +16,7 @@ Si_            lennard-Jones   100.26365  2.200   #155.998    3.80414
 Oz             lennard-Jones    37.598867 1.770
 He             lennard-jones    10.9      2.64
 CH4            lennard-jones    148.0     3.73
-Ar             lennard-jones    119.8     3.41    # Tanaka et al.
+Ar             lennard-jones    119.8     3.41    # Tanaka et al. 119.8     3.34
 Kr             lennard-jones    166.4     3.636
 Xe             lennard-jones    221.0     4.1
 # general mixing rule for Lennard-Jones

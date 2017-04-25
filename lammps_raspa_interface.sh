@@ -20,7 +20,7 @@ pressure=$3
 guest=$4
 MCCycles=1
 # MC
-CyclesEvery=5000
+CyclesEvery=50000
 InitCycles=$(echo "$CyclesEvery * 0.1" | bc -l | sed 's/\./ /g' | awk '{print $1}')
 MoviesEvery=$((CyclesEvery - 1))
 # MD

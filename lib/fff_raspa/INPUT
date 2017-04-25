@@ -23,7 +23,7 @@ Component 0 MoleculeName               GUEST
             FugacityCoefficient        1.0
             TranslationProbability     1.0
             RegrowProbability          1.0
-            SwapProbability            1.0
+            SwapProbability            SWAPPROBABILITY
             WidomProbability           1.0
-            CFSwapLambdaProbability    1.0
-            CreateNumberOfMolecules    0
+            CFSwapLambdaProbability    SWAPPROBABILITY
+            CreateNumberOfMolecules    NMOLECULES

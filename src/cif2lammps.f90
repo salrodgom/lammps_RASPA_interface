@@ -86,8 +86,9 @@ program zif_cif2gin
  integer                                      :: n_imprs_max = 100000
 ! arguments in line
  character(len=100),dimension(:), allocatable :: args
- logical                                      :: charges_flag =.true.
+ logical                                      :: charges_flag         = .true.
  logical                                      :: modify_topology_flag = .false.
+ logical                                      :: fill_with_Ar_flag    = .false.
  !
  num_args = command_argument_count()
  allocate(args(num_args))
@@ -114,6 +115,8 @@ program zif_cif2gin
     string_stop_head= "_atom_site_fract_z"
    case ('-S','--search-and-modify-topology')
     modify_topology_flag = .true.
+   case ('-F','--fill-with-Ar')
+    fill_with_Ar_flag = .true.
   end select
  end do
  open(100,file=CIFfilename,status='old',iostat=ierr)
@@ -191,6 +194,9 @@ program zif_cif2gin
   end do
  end do read_atoms
  close(100)
+ if ( fill_with_Ar_flag ) then
+  call FillStructureWithAr()
+ end if
 ! topology:
  DistanceMatrix=0.0
  ConnectedAtoms=.false.
@@ -640,6 +646,19 @@ program zif_cif2gin
  deallocate(atom)
  stop 'Done'
  contains
+ subroutine FillStructureWithAr()
+  implicit none
+  integer :: i
+  logical :: Ar_allocated =.false.
+  do i=1,n_atom_types
+   select case (atom_types(i))
+    case('Ar  ','  Ar','Ar00':'Ar99')
+     Ar_allocated=.true.
+   end select
+  end do
+  if( Ar_allocated.eqv..false. ) n_atom_types = n_atom_types + 1
+  atom_types(n_atom_types)='Ar  '
+ end subroutine FillStructureWithAr
  subroutine search_forcefield(string,interaction,label)
   implicit none
   character(len=80),intent(out):: string

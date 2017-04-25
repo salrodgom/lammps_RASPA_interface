@@ -45,6 +45,7 @@ program zif_cif2gin
  end type 
  ! allocatable
  type(node),allocatable,dimension(:) :: atom
+ type(node),allocatable,dimension(:) :: guest_atom
  real,allocatable    :: DistanceMatrix(:,:)
  logical,allocatable :: ConnectedAtoms(:,:)
  integer :: bond_types_max=100, bend_types_max=100, tors_types_max=100, impr_types_max=100
@@ -648,16 +649,48 @@ program zif_cif2gin
  contains
  subroutine FillStructureWithAr()
   implicit none
-  integer :: i
+  integer :: i,kx,ky,kz
   logical :: Ar_allocated =.false.
-  do i=1,n_atom_types
-   select case (atom_types(i))
-    case('Ar  ','  Ar','Ar00':'Ar99')
-     Ar_allocated=.true.
-   end select
-  end do
-  if( Ar_allocated.eqv..false. ) n_atom_types = n_atom_types + 1
-  atom_types(n_atom_types)='Ar  '
+  integer :: n_filling_atoms = 0
+  real    :: x,y,z
+  real    :: Ar_coor(3,1000) = 0.0
+  real    :: cell_1(6)
+  write(6,*)'Filling with Ar!'
+  cell_1(1)=5.235
+  cell_1(2)=5.235
+  cell_1(3)=5.235
+  cell_1(4)=90.0 
+  cell_1(5)=90.0
+  cell_1(6)=90.0
+  x=0.0
+  y=0.0
+  z=0.0
+  kx=1
+  ky=1
+  kz=1
+  filling_cycle: do
+   if(kx==1.and.ky==1.and.kz==1)then
+    n_filling_atoms = 4
+!
+    Ar_coor(1,1)=0.0
+    Ar_coor(2,1)=0.0
+    Ar_coor(3,1)=0.0
+    !
+    Ar_coor(1,2)=0.0
+    Ar_coor(2,2)=0.5
+    Ar_coor(3,2)=0.5
+    !
+    Ar_coor(1,3)=0.5
+    Ar_coor(2,3)=0.0
+    Ar_coor(3,3)=0.5
+!
+    Ar_coor(1,4)=0.5
+    Ar_coor(2,4)=0.5
+    Ar_coor(3,4)=0.0
+   end if
+  end do filling_cycle
+  allocate(guest_atom(n_filling_atoms))
+  return
  end subroutine FillStructureWithAr
  subroutine search_forcefield(string,interaction,label)
   implicit none

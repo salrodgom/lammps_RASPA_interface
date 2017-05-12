@@ -647,7 +647,14 @@ program zif_cif2gin
  deallocate(atom)
  stop 'Done'
  contains
+ !
  subroutine FillStructureWithAr()
+  implicit none
+  write(6,*)'Filling structure with Ar!'
+  call FillCellWithAr()
+ end subroutine FillStructureWithAr
+ !
+ subroutine FillCellWithAr()
   implicit none
   integer :: i,kx,ky,kz
   logical :: Ar_allocated =.false.
@@ -655,7 +662,6 @@ program zif_cif2gin
   real    :: x,y,z
   real    :: Ar_coor(3,1000) = 0.0
   real    :: cell_1(6)
-  write(6,*)'Filling with Ar!'
   cell_1(1)=5.235
   cell_1(2)=5.235
   cell_1(3)=5.235
@@ -691,7 +697,8 @@ program zif_cif2gin
   end do filling_cycle
   allocate(guest_atom(n_filling_atoms))
   return
- end subroutine FillStructureWithAr
+ end subroutine FillCellWithAr
+!
  subroutine search_forcefield(string,interaction,label)
   implicit none
   character(len=80),intent(out):: string

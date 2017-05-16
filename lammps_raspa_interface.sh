@@ -1,9 +1,11 @@
 #/bin/bash
 # ==================================================================
 # Author:  Salvador Rodriguez-Gomez Balestra
+#          A. Rabdel Ruiz-Salvador
+#          Said hamad Gomez
+# Date: Tue 16 May 2017
 # License: MIT License
 # ==================================================================
-
 # Inputs:  CIF, Temperature, Pressure, Guest_Molecule, #MCEMMDCycles
 # ==================================================================
 CIFFile=$1
